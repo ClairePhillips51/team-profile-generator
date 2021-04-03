@@ -1,8 +1,16 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+const Engineer = require('./lib/Engineer');
+const Manager = require('./lib/Manager');
+const Intern = require('./lib/Intern');
+const HtmlHelpers = require('./src/htmlhelpers');
 
 async function main(){
-    let html = "";
+    let html = HtmlHelpers.beginHtml()
+    html += HtmlHelpers.makeHead()
+    html += HtmlHelpers.beginBody()
+    html += HtmlHelpers.makeHeader()
+    html += HtmlHelpers.beginCards()
     let done = false;
 
     // Get Manager's info
@@ -30,7 +38,8 @@ async function main(){
             },
         ])
         .then((responses) => {
-            html += "";
+            let employee = new Manager(responses.name, responses.id, responses.email, responses.officeNumber);
+            html += HtmlHelpers.makeCard(employee.getName(), employee.getRole(), employee.getId(), employee.getEmail(), employee.getOfficeNumber());
         });
 
     // While not done do prompts
@@ -77,7 +86,8 @@ async function main(){
                     },
                 ])
                 .then((responses) => {
-                    html += "";
+                    let employee = new Engineer(responses.name, responses.id, responses.email, responses.github);
+                    html += HtmlHelpers.makeCard(employee.getName(), employee.getRole(), employee.getId(), employee.getEmail(), employee.getGitHub());
                 });
         } else if (choice === "Intern") {
             await inquirer
@@ -104,13 +114,15 @@ async function main(){
                     },
                 ])
                 .then((responses) => {
-                    html += "";
+                    let employee = new Intern(responses.name, responses.id, responses.email, responses.school);
+                    html += HtmlHelpers.makeCard(employee.getName(), employee.getRole(), employee.getId(), employee.getEmail(), employee.getSchool());
                 });
         } else {
             done = true;
         }
     }
 
+    html += HtmlHelpers.endCardsBodyAndHtml();
     fs.writeFile('dist/index.html', html, (err) =>
     err ? console.log(err) : console.log('Successfully created index.html!')
     );
